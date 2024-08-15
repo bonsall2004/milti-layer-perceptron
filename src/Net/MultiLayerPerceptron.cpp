@@ -35,24 +35,24 @@ MultiLayerPerceptron::MultiLayerPerceptron(size_t input_size, size_t hidden_size
 
 std::vector<double> MultiLayerPerceptron::forward(const std::vector<double>& input)
 {
-  for(int j = 0; j < hidden_layers.size(); j++)
+  for(int i = 0; i < hidden_layers.size(); i++)
   {
-    hidden_layers[j] = 0.0;
-    for(int i = 0; i < input.size(); i ++)
+    hidden_layers[i] = 0.0;
+    for(int j = 0; j < input.size(); j ++)
     {
-      hidden_layers[j] += input[i] * weights_input_hidden[i][j];
+      hidden_layers[i] += input[j] * weights_input_hidden[j][i];
     }
-    hidden_layers[j] = sigmoid(hidden_layers[j]);
+    hidden_layers[i] = sigmoid(hidden_layers[i]);
   }
 
-  for(int k = 0; k < output_layers.size(); k++)
+  for(int i = 0; i < output_layers.size(); i++)
   {
-    output_layers[k] = 0.0;
+    output_layers[i] = 0.0;
     for(int j = 0; j < hidden_layers.size(); j++)
     {
-      output_layers[k] += hidden_layers[j] * weights_hidden_output[j][k];
+      output_layers[i] += hidden_layers[j] * weights_hidden_output[j][i];
     }
-    output_layers[k] = sigmoid(output_layers[k]);
+    output_layers[i] = sigmoid(output_layers[i]);
   }
 
   return output_layers;
@@ -63,26 +63,26 @@ void MultiLayerPerceptron::backward(const std::vector<double>& input, const std:
   std::vector<double> output_errors(output_layers.size());
   std::vector<double> hidden_errors(hidden_layers.size());
 
-  for(int k = 0; k < output_layers.size(); k ++)
+  for(int i = 0; i < output_layers.size(); i ++)
   {
-    output_errors[k] = (target[k] - output_layers[k]) * sigmoid_derivative(output_layers[k]);
+    output_errors[i] = (target[i] - output_layers[i]) * sigmoid_derivative(output_layers[i]);
   }
 
-  for(int j = 0; j < hidden_layers.size(); j++)
+  for(int i = 0; i < hidden_layers.size(); i++)
   {
-    hidden_errors[j] = 0.0;
-    for(int k = 0; k < output_layers.size(); k++)
+    hidden_errors[i] = 0.0;
+    for(int j = 0; j < output_layers.size(); j++)
     {
-      hidden_errors[j] += output_errors[k] * weights_hidden_output[j][k];
+      hidden_errors[i] += output_errors[j] * weights_hidden_output[i][j];
     }
-    hidden_errors[j] *= sigmoid_derivative(hidden_layers[j]);
+    hidden_errors[i] *= sigmoid_derivative(hidden_layers[i]);
   }
 
-  for(int j = 0; j < hidden_layers.size(); j++)
+  for(int i = 0; i < hidden_layers.size(); i++)
   {
-    for(int k = 0; k < output_layers.size(); k++)
+    for(int j = 0; j < output_layers.size(); j++)
     {
-      weights_hidden_output[j][k] += learning_rate * output_errors[k] * hidden_layers[j];
+      weights_hidden_output[i][j] += learning_rate * output_errors[j] * hidden_layers[i];
     }
   }
 
@@ -99,10 +99,10 @@ void MultiLayerPerceptron::train(const std::vector<std::vector<double>>& trainin
 {
   for(int epoch = 0; epoch < epochs; epoch++)
   {
-    for(int j = 0; j < training_inputs.size(); j++)
+    for(int i = 0; i < training_inputs.size(); i++)
     {
-      forward(training_inputs[j]);
-      backward(training_inputs[j], training_outputs[j], learning_rate);
+      forward(training_inputs[i]);
+      backward(training_inputs[i], training_outputs[i], learning_rate);
 
     }
     if((epoch % 100) == 0) printf("Completed Epochs: %d\n", epoch);
